@@ -13,3 +13,12 @@ exports.createSemester = (req, res) => {
     res.status(201).json({ message: 'Semester created', id: result.insertId });
   });
 };
+
+exports.getSemesters = (req, res) => {
+  const sql = `SELECT * FROM semester`;
+
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.status(200).json(results);
+  });
+};

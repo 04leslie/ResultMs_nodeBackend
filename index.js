@@ -62,3 +62,7 @@ app.use('/api/levels', levelRoutes);
 //student route
 const studentRoutes = require('./routes/studentRoutes');
 app.use('/api/students', studentRoutes);
+
+//student route
+const courseRoutes = require('./routes/courseRoutes');
+app.use('/api/courses', courseRoutes);

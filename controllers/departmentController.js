@@ -68,3 +68,13 @@ exports.getDepartmentsByFacultyAndLevel = (req, res) => {
     res.status(200).json(results);
   });
 };
+exports.getDepartmentsByLevel = (req, res) => {
+  const levelId = req.params.levelId;
+
+  const sql = `SELECT * FROM department WHERE level_id = ?`;
+
+  db.query(sql, [levelId], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.status(200).json(results);
+  });
+};

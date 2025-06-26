@@ -9,5 +9,9 @@ router.get('/', departmentController.getDepartments);
 router.post('/', departmentController.createDepartment);
 
 // Route to fetch by facultyId & levelId
-router.get('/', departmentController.getDepartmentsBySchoolAndLevel);
+router.get('/', departmentController.getDepartmentsByFacultyAndLevel);
+
+// Get departments by level ID
+router.get('/by-level/:levelId', departmentController.getDepartmentsByLevel);
+
 module.exports = router;
