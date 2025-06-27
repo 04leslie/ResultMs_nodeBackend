@@ -16,8 +16,14 @@ exports.createCourse = (req, res) => {
   });
 };
 
-// Get all courses with joined data
-exports.getCourses = (req, res) => {
+// GET /api/courses/by-dept-session-semester
+exports.getCoursesByDeptSessionSemester = (req, res) => {
+  const { departmentId, levelId, sessionId, semesterId } = req.query;
+
+  if (!departmentId || !levelId || !sessionId || !semesterId) {
+    return res.status(400).json({ error: "All parameters are required." });
+  }
+
   const sql = `
     SELECT course.*, 
       level.name AS level_name,
@@ -29,13 +35,12 @@ exports.getCourses = (req, res) => {
     JOIN sessions ON course.session_id = sessions.id
     JOIN semester ON course.semester_id = semester.id
     JOIN department ON course.department_id = department.id
+    WHERE course.department_id = ? AND course.level_id = ? AND course.session_id = ? AND course.semester_id = ?
   `;
 
-  db.query(sql, (err, results) => {
-  if (err) {
-    console.error("Database query error:", err);
-    return res.status(500).json({ error: err.message });
-  }
-  res.status(200).json(results);
-});
+  db.query(sql, [departmentId, levelId, sessionId, semesterId], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.status(200).json(results);
+  });
 };
+
