@@ -70,3 +70,10 @@ app.use('/api/courses', courseRoutes);
 //result route
 const resultRoutes = require('./routes/resultRoutes');
 app.use('/api/result', resultRoutes);
+
+//complaint route
+const complaintRoutes = require('./routes/complaintRoutes');
+app.use('/api/complaints', complaintRoutes);
+
+const studentAuthRoutes = require('./routes/studentAuthRoutes');
+app.use('/api/student', studentAuthRoutes);

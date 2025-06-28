@@ -1,6 +1,6 @@
 const db = require('../db'); // Adjust path if needed
 
-// POST /api/results - save results for multiple students
+// POST /api/results, save results for multiple students
 exports.storeResults = async (req, res) => {
   const { students } = req.body;
 
@@ -17,7 +17,7 @@ exports.storeResults = async (req, res) => {
   `;
 
   const values = students.map(s => [
-    s.matricule,
+    s.student_matricule,
     s.course_id,
     s.department_id,
     s.level_id,
@@ -42,4 +42,32 @@ exports.storeResults = async (req, res) => {
   }
 }
 
+// GET /api/result/student-results?matricule=...&sessionId=...&semesterId=...
+exports.getResultsByMatricule = async (req, res) => {
+  const { matricule, sessionId, semesterId } = req.query;
+
+  if (!matricule || !sessionId || !semesterId) {
+    return res.status(400).json({ error: 'Missing matricule, sessionId, or semesterId' });
+  }
+
+  try {
+    const [results] = await db.promise().query(`
+      SELECT 
+        r.*, 
+        c.title AS course_name, 
+        c.code AS course_code, 
+        c.credit
+      FROM result r
+      JOIN course c ON r.course_id = c.id
+      WHERE r.student_matricule = ? 
+        AND r.session_id = ? 
+        AND r.semester_id = ?
+    `, [matricule, sessionId, semesterId]);
+
+    res.json(results);
+  } catch (error) {
+    console.error("Error fetching student results:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
