@@ -2,15 +2,18 @@ const db = require('../db');
 
 // Send a complaint (student)
 exports.sendComplaint = async (req, res) => {
-  const { student_matricule, complaint_text } = req.body;
+  const { student_matricule, complaint_text, session_id, semester_id } = req.body;
 
-  if (!student_matricule || !complaint_text) {
-    return res.status(400).json({ error: 'Matricule and complaint text are required.' });
+  if (!student_matricule || !complaint_text || !session_id || !semester_id) {
+  return res.status(400).json({ error: 'All fields are required.' });
   }
 
   try {
-    const sql = "INSERT INTO complaints (student_matricule, complaint_text) VALUES (?, ?)";
-    await db.promise().query(sql, [student_matricule, complaint_text]);
+    const sql = `
+    INSERT INTO complaints (student_matricule, complaint_text, session_id, semester_id)
+    VALUES (?, ?, ?, ?)
+    `;
+    await db.promise().query(sql, [student_matricule, complaint_text, session_id, semester_id]);
     res.status(201).json({ message: 'Complaint sent successfully.' });
   } catch (error) {
     console.error('Error sending complaint:', error);
@@ -21,7 +24,16 @@ exports.sendComplaint = async (req, res) => {
 // Get all complaints (admin view)
 exports.getAllComplaints = async (req, res) => {
   try {
-    const sql = "SELECT * FROM complaints ORDER BY created_at DESC";
+    const sql = `
+  SELECT 
+    c.*, 
+    s.name AS session_name, 
+    sem.name AS semester_name 
+  FROM complaints c
+  JOIN sessions s ON c.session_id = s.id
+  JOIN semester sem ON c.semester_id = sem.id
+  ORDER BY c.created_at DESC
+`;
     const [results] = await db.promise().query(sql);
     res.status(200).json(results);
   } catch (error) {
@@ -35,7 +47,17 @@ exports.getComplaintsByStudent = async (req, res) => {
   const { matricule } = req.params;
 
   try {
-    const sql = "SELECT * FROM complaints WHERE student_matricule = ? ORDER BY created_at ASC";
+    const sql = `
+  SELECT 
+    c.*, 
+    s.name AS session_name, 
+    sem.name AS semester_name 
+  FROM complaints c
+  JOIN sessions s ON c.session_id = s.id
+  JOIN semester sem ON c.semester_id = sem.id
+  WHERE c.student_matricule = ?
+  ORDER BY c.created_at ASC
+`;
     const [results] = await db.promise().query(sql, [matricule]);
     res.status(200).json(results);
   } catch (error) {

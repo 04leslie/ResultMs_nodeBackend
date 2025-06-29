@@ -12,6 +12,6 @@ router.get('/', complaintController.getAllComplaints);
 router.get('/:matricule', complaintController.getComplaintsByStudent);
 
 // Reply to a complaint
-router.post('/reply/:id', complaintController.replyToComplaint);
+router.post('/:id/reply', complaintController.replyToComplaint);
 
 module.exports = router;
