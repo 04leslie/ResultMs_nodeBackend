@@ -22,3 +22,13 @@ exports.getSemesters = (req, res) => {
     res.status(200).json(results);
   });
 };
+exports.getSemestersBySession = (req, res) => {
+  const { sessionId } = req.params;
+
+  const sql = `SELECT id, name FROM semester WHERE session_id = ?`;
+
+  db.query(sql, [sessionId], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.status(200).json(results);
+  });
+};

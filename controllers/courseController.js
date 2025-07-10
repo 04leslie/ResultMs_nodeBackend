@@ -44,3 +44,23 @@ exports.getCoursesByDeptSessionSemester = (req, res) => {
   });
 };
 
+// Get all courses
+exports.getAllCourses = (req, res) => {
+  const sql = `
+    SELECT course.*, 
+      level.name AS level_name,
+      sessions.name AS session_name,
+      semester.name AS semester_name,
+      department.name AS department_name
+    FROM course
+    JOIN level ON course.level_id = level.level_id
+    JOIN sessions ON course.session_id = sessions.id
+    JOIN semester ON course.semester_id = semester.id
+    JOIN department ON course.department_id = department.id
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.status(200).json(results);
+  });
+};

@@ -9,7 +9,7 @@ router.get('/', departmentController.getDepartments);
 router.post('/', departmentController.createDepartment);
 
 // Route to fetch by facultyId & levelId
-router.get('/', departmentController.getDepartmentsByFacultyAndLevel);
+router.get('/filter', departmentController.getDepartmentsByFacultyLevelSession);
 
 // Get departments by level ID
 router.get('/by-level/:levelId', departmentController.getDepartmentsByLevel);

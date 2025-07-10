@@ -18,18 +18,18 @@ exports.getDepartments = (req, res) => {
 exports.createDepartment = (req, res) => {
  console.log("Received data:", req.body);
 
-  const { name, dept_code, school_id, level_id } = req.body;
+  const { name, dept_code, school_id, level_id, session_id } = req.body;
 
-  if (!name || !dept_code || !school_id || !level_id) {
+  if (!name || !dept_code || !school_id || !level_id || !session_id) {
     return res.status(400).json({ error: "All fields are required." });
   }
 
   const insertSql = `
-    INSERT INTO department (school_id, level_id, dept_code, name)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO department (school_id, level_id, dept_code, name, session_id)
+    VALUES (?, ?, ?, ?, ?)
   `;
 
-  db.query(insertSql, [school_id, level_id, dept_code, name], (err, result) => {
+  db.query(insertSql, [school_id, level_id, dept_code, name, session_id], (err, result) => {
     if (err) {
          console.error("DB Error:", err);
         return res.status(500).json({ error: err.message });
@@ -40,7 +40,7 @@ exports.createDepartment = (req, res) => {
       SELECT department.*, school.name AS faculty, level.name AS level
       FROM department
       JOIN school ON department.school_id = school.id
-      JOIN level ON department.level_id = level.id
+      JOIN level ON department.level_id = level.level_id
       WHERE department.id = ?
     `;
 
@@ -51,23 +51,28 @@ exports.createDepartment = (req, res) => {
   });
 };
 
-exports.getDepartmentsByFacultyAndLevel = (req, res) => {
-  const { facultyId, levelId } = req.query;
+exports.getDepartmentsByFacultyLevelSession = (req, res) => {
+  const { facultyId, levelId, sessionId } = req.query;
 
-  if (!facultyId || !levelId) {
-    return res.status(400).json({ error: 'facultyId and levelId are required' });
+  if (!facultyId || !levelId || !sessionId) {
+    return res.status(400).json({ error: 'facultyId, levelId, and sessionId are required' });
   }
 
   const sql = `
-    SELECT * FROM departments 
-    WHERE faculty_id = ? AND level_id = ?
+    SELECT department.*, school.name AS faculty, level.name AS level, session.name AS session
+    FROM department
+    JOIN school ON department.school_id = school.id
+    JOIN level ON department.level_id = level.level_id
+    JOIN session ON department.session_id = session.id
+    WHERE department.school_id = ? AND department.level_id = ? AND department.session_id = ?
   `;
 
-  db.query(sql, [facultyId, levelId], (err, results) => {
+  db.query(sql, [facultyId, levelId, sessionId], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.status(200).json(results);
   });
 };
+
 exports.getDepartmentsByLevel = (req, res) => {
   const levelId = req.params.levelId;
 

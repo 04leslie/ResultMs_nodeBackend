@@ -77,3 +77,6 @@ app.use('/api/complaints', complaintRoutes);
 
 const studentAuthRoutes = require('./routes/studentAuthRoutes');
 app.use('/api/student', studentAuthRoutes);
+
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
