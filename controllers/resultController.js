@@ -1,6 +1,5 @@
-const db = require('../db'); // Adjust path if needed
+const db = require('../db'); 
 
-// POST /api/results, save results for multiple students
 exports.storeResults = async (req, res) => {
   const { students } = req.body;
 
@@ -42,7 +41,7 @@ exports.storeResults = async (req, res) => {
   }
 }
 
-// GET /api/result/student-results?matricule=...&sessionId=...&semesterId=...
+
 exports.getResultsByMatricule = async (req, res) => {
   const { matricule, sessionId, semesterId } = req.query;
 
@@ -71,3 +70,20 @@ exports.getResultsByMatricule = async (req, res) => {
   }
 };
 
+
+exports.getResultsByMeta = (req, res) => {
+  const { course_id, department_id, level_id, session_id, semester_id } = req.query;
+
+  const sql = `
+    SELECT r.*, s.name AS student_name
+    FROM result r
+    JOIN student s ON r.student_matricule = s.matricule
+    WHERE r.course_id = ? AND r.department_id = ? AND r.level_id = ?
+    AND r.session_id = ? AND r.semester_id = ?
+  `;
+
+  db.query(sql, [course_id, department_id, level_id, session_id, semester_id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.status(200).json(rows);
+  });
+};

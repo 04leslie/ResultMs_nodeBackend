@@ -1,6 +1,6 @@
 const db = require('../db');
 
-// ✅ GET all departments
+// GET all departments
 exports.getDepartments = (req, res) => {
   const sql = `
     SELECT department.*, school.name AS faculty, level.name AS level
@@ -59,16 +59,17 @@ exports.getDepartmentsByFacultyLevelSession = (req, res) => {
   }
 
   const sql = `
-    SELECT department.*, school.name AS faculty, level.name AS level, session.name AS session
+    SELECT department.*, school.name AS faculty, level.name AS level, sessions.name AS session
     FROM department
     JOIN school ON department.school_id = school.id
     JOIN level ON department.level_id = level.level_id
-    JOIN session ON department.session_id = session.id
+    JOIN sessions ON department.session_id = sessions.id
     WHERE department.school_id = ? AND department.level_id = ? AND department.session_id = ?
   `;
 
   db.query(sql, [facultyId, levelId, sessionId], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
+    console.log('DB Results:', results);
     res.status(200).json(results);
   });
 };
